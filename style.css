@@ -1,0 +1,16 @@
+/*   
+Theme Name: Genesis Image
+Theme URI: http://www.bobbingwide.com/themes/genesis-image
+Description: Child theme of genesis framework with image.php
+Author: Bobbing Wide  
+Author URI: http://www.oik-plugins.com/author/bobbingwide
+Version: 1.0 
+Template: genesis 
+Template Version: 2.1.2  
+Tags:   
+License: GPL-2.0+  
+License URI: http://www.gnu.org/licenses/gpl-2.0.html  
+*/
+
+@import url("../genesis/style.css" );
+

@@ -1,10 +1,11 @@
 <?php // (C) Copyright Bobbing Wide 2016
-
+if ( !defined( "CLASS_OIK_THEME_UPDATE_INCLUDED" ) ) {
+define( "CLASS_OIK_THEME_UPDATE_INCLUDED", "0.0.1" );
 
 /**
- * Implements oik's plugin update logic
+ * Implements oik's theme update logic
  *
- * Class: OIK_Plugin_Update
+ * Class: OIK_Theme_Update
  
  *
  * Note: We use bw_trace2() and bw_backtrace() but can't use trace levels since we don't know if trace is actually available. 
@@ -12,7 +13,7 @@
  * 
  * We also use oik library functions with bootstrapping logic 
  */
-class OIK_Plugin_Update {
+class OIK_Theme_Update {
 
 	/**
 	 * @var $instance - the true instance
@@ -30,13 +31,10 @@ class OIK_Plugin_Update {
 	}
 
 	/** 
-	 * Constructor for OIK_Plugin_Update
-	 * 
-	 * First thing we do is to find out if we really need to do anything, or if it's already been done, or didn't need doing in the first place.
+	 * Constructor for OIK_Theme_Update
 	 * 
 	 */
 	function __construct() {
-		//gob();
 	}
 	
 	/**
@@ -46,8 +44,8 @@ class OIK_Plugin_Update {
 	 * @return string the generated HTML
 	 */								 
 	function show_update_message( $text ) {
-		$message = '<tr class="plugin-update-tr">';
-		$message .= '<td colspan="3" class="plugin-update colspanchange">';
+		$message = '<tr class="theme-update-tr">';
+		$message .= '<td colspan="3" class="theme-update colspanchange">';
 		$message .= '<div class="update-message">';
 		$message .= $text;
 		$message .= "</div>";
@@ -66,14 +64,13 @@ class OIK_Plugin_Update {
 		echo $message;
 	}
 	
-	
 	/**
-	 * Implement "after_plugin_row" for this plugin
+	 * Implement "after_theme_row" for this theme
 	 * 
 	 * Quick and dirty solution to decide if data migration is required
 	 * and if so produce a link to the Migration settings page.
 	 */
-	function after_plugin_row( $plugin_file, $plugin_data, $status ) {
+	function after_theme_row( $theme_file, $theme_data, $status ) {
 		bw_trace2();
 		$message = "Use oik to check for updates";
 		$this->show_update_message( "$message" );
@@ -83,21 +80,21 @@ class OIK_Plugin_Update {
 	 * Returns admin page URL 
 	 */
 	public static function get_page_url() {
-		$args = array( 'page' => 'oik_plugins' );
+		$args = array( 'page' => 'oik_themes' );
 		$url = add_query_arg( $args, admin_url( "admin.php" ) );
 		return $url;
 	}
 
 	/**
-	 * Implement "plugin_action_links" 
+	 * Implement "theme_action_links" 
 	 * 
-	 * @TODO Determine if it's really necessary to create the link to the "oik plugins" page.
+	 * @TODO Determine if it's really necessary to create the link to the "oik themes" page.
 	 *
 	 */
-	function plugin_action_links( $links, $file, $plugin_data, $context ) {
+	function theme_action_links( $links, $file, $theme_data, $context ) {
 		bw_trace2();
-		//bw_trace2( plugin_basename( __FILE__ ), "plugin_basename" );
-		//if ( $file == plugin_basename( __FILE__ ) ) {
+		//bw_trace2( theme_basename( __FILE__ ), "theme_basename" );
+		//if ( $file == theme_basename( __FILE__ ) ) {
 			$links['update'] =  '<a href="' . esc_url( self::get_page_url() ) . '">'.esc_html__( 'Settings' , 'oik-weight-zone-shipping-pro').'</a>';
 		//}
 		return( $links );
@@ -122,19 +119,27 @@ class OIK_Plugin_Update {
 	 * We do not need to implement the "admin_menu" if oik has already done it.
 	 * Can we check did_action( "oik_admin_menu" ) ?
 	 * 
+	 *
+	 * Actually, we need to check for both oik_menu and oik_themes 
+		
 	 * 
-		//add_options_page( __( 'oik plugins', 'oik' ), __( 'Plugins', 'oik' ), 'manage_options', "api-key-config", array( $this, 'oik_plugins_do_page' ) );
+	 * 
+		//add_options_page( __( 'oik themes', 'oik' ), __( 'themes', 'oik' ), 'manage_options', "api-key-config", array( $this, 'oik_themes_do_page' ) );
 	 */
 	function admin_menu() {
-	
+		$oik_themes = array( $this, 'oik_themes_do_page' );
 		$menu_slug = $this->query_menu( "oik_menu" );
-		if ( $menu_slug ) {
-			// oik_menu is already defined. No need to add it again
-		} else { 
-			$oik_plugins = array( $this, 'oik_plugins_do_page' );
-			//$hook = add_menu_page( __('[oik] Options', 'oik'), __('oik plugins', 'oik'), 'manage_options', 'oik_plugins', $oik_plugins, 'div' );
-			$hook = add_menu_page( __('[oik] Options', 'oik'), __('oik plugins', 'oik'), 'manage_options', 'oik_plugins', $oik_plugins );
-			add_submenu_page( 'oik_menu', __( 'oik plugins', 'oik' ), __('Plugins', 'oik'), 'manage_options', 'oik_plugins', $oik_plugins );
+		bw_trace2( $menu_slug, "menu_slug" );
+		$themes_slug = $this->query_menu( "oik_themes" );
+		if ( !$menu_slug ) {
+			$hook = add_menu_page( __('[oik] Options', 'oik'), __('oik themes', 'oik'), 'manage_options', 'oik_themes', $oik_themes );
+			bw_trace2( $hook, "hook" );
+			
+		}
+		
+		if ( !$themes_slug ) {
+			add_submenu_page( 'oik_menu', __( 'oik themes', 'oik' ), __('themes', 'oik'), 'manage_options', 'oik_themes', $oik_themes );
+			add_submenu_page( 'oik_plugins', __( 'oik themes', 'oik' ), __('themes', 'oik'), 'manage_options', 'oik_themes', $oik_themes );
 			$loaded = $this->bootstrap_oik_libs();
 			if ( $loaded ) {
 				$dependencies = array( "class-bobbcomp" => "0.0.1" 
@@ -143,23 +148,23 @@ class OIK_Plugin_Update {
 														 );
 				$loaded = $this->require_dependencies( $dependencies ); 
 				if ( $loaded ) {
-					do_action( "oik_register_plugin_server" );
+					do_action( "oik_register_theme_server" );
 				}
 			}	
 		}		
 	}
 
 	/**
-	 * Implement oik's Plugins page
+	 * Implement oik's themes page
 	 *
-	 * This allows oik-weight-zone-shipping-pro and other oik plugins to 
-	 * implement automatic / manual updates from an oik-plugins server.
+	 * This allows oik-weight-zone-shipping-pro and other oik themes to 
+	 * implement automatic / manual updates from an oik-themes server.
 	 *
-	 * The logic caters for oik, or another plugin, already providing the logic. See "admin_menu".
+	 * The logic caters for oik, or another theme, already providing the logic. See "admin_menu".
 	 * 
 	 * When we've 
 	 */
-	function oik_plugins_do_page() {
+	function oik_themes_do_page() {
 		$loaded = $this->bootstrap_oik_libs();
 		if ( $loaded ) {
 			$dependencies = array( "class-bobbcomp" => "0.0.1" 
@@ -167,7 +172,7 @@ class OIK_Plugin_Update {
 													 , "bobbforms" => "3.0.1"
 													 , "oik-admin" => "3.0.1"
 													 , "oik-depends" => "3.1.0"
-													 , "oik_plugins" => "0.1.0"
+													 , "oik_themes" => "0.0.2"
 													 );
 			
 			$loaded = $this->require_dependencies( $dependencies ); 
@@ -182,10 +187,10 @@ class OIK_Plugin_Update {
 			//					if ( $admin ) {
 			//						$depends = $this->require_lib( "oik-depends", "3.1.0" ); 
 			//						if ( $depends ) {
-			//							$plugins = $this->require_lib( "oik_plugins", "0.1.0" );
-			//							if ( $plugins ) {
+			//							$themes = $this->require_lib( "oik_themes", "0.1.0" );
+			//							if ( $themes ) {
 			if ( $loaded ) {							
-				oik_lazy_plugins_server_settings();
+				oik_lazy_themes_server_settings();
 				bw_flush()	;
 			} else {
 				$this->show_update_nag( "eh?" );
@@ -255,7 +260,7 @@ class OIK_Plugin_Update {
 	function report_error( $text ) {
 		$this->show_update_nag( $text );
 	}
-	
+
 	/**
 	 * Checks compatible versions
 	 *
@@ -284,7 +289,7 @@ class OIK_Plugin_Update {
     }
     return( $acceptable );
   }
-	
+
 	/**
 	 *
 	 */
@@ -293,7 +298,6 @@ class OIK_Plugin_Update {
 		if ( function_exists( "oik_require_lib" ) ) {
 			$loaded = true;
 		} else {
-			//require_once( WP_PLUGIN_DIR . '/' .  "oik-weight-zone-shipping-pro/libs/oik_boot.php" );
 			require_once( __DIR__ . "/oik_boot.php" );
 			$loaded = true;
 		}
@@ -307,5 +311,6 @@ class OIK_Plugin_Update {
 		return( $loaded );
 	}
 
-
 }
+
+} /* end if !defined */

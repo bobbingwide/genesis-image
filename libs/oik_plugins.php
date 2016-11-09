@@ -20,17 +20,16 @@ if ( !defined( "OIK_PLUGINS_INCLUDED" ) ) {
  *
  * Processing depends on the button that was pressed. There should only be one!
  * 
- * Selection                       Validate? Perform action          Display check Display add  Display edit Display select list
- * ------------------------------- --------  -------------------     ------------- ------------ ------------ -------------------
- * check_plugin                    No        n/a                     Yes           -            -            -
- * delete_plugin                   No        delete selected plugin  -             -            -            Yes
- * edit_plugin                     No        n/a                     -             -            Yes          Yes
- *                                                                              
- * _oik_plugins_edit_settings      Yes       update selected plugin  -             -            Yes          Yes
- * _oik_plugins_add_plugin
- * _oik_plugins_add_settings
+ * Selection                     |  Validate? | Perform action         | Display check | Display add  | Display edit | Display select list
+ * ----------------------------- | --------   |-------------------     |-------------  | ------------ | ------------ | -------------------
+ * check_plugin                  |  No        | n/a                    | Yes           | -            | -            | -
+ * delete_plugin                 |  No        | delete selected plugin | -             | -            | -            | Yes
+ * edit_plugin                   |  No        | n/a                    | -             | -            | Yes          | Yes
+ * _oik_plugins_edit_settings    |  Yes       | update selected plugin | -             | -            | Yes          | Yes
+ * _oik_plugins_add_plugin			 |	No				| n/a										 | -						 | Yes          | - 					 | ?
+ * _oik_plugins_add_settings		 |	Yes				| add selected plugin		 | -						 | -						| - 					 | ?
  * 
-*/
+ */
 function oik_lazy_plugins_server_settings() {
 	bw_trace2();
 	bw_backtrace();
@@ -167,6 +166,9 @@ function _oik_plugins_settings_table() {
 
 /**
  * Add the settings for the plugin
+ * 
+ * @param array $plugin
+ * @return bool true
  */
 function _oik_plugins_add_settings( $plugin ) {
   $field = bw_array_get( $plugin, "plugin", null );
@@ -179,6 +181,8 @@ function _oik_plugins_add_settings( $plugin ) {
 
 /** 
  * Update the settings for a plugin
+ * 
+ * @param array $plugin
  */
 function _oik_plugins_update_settings( $plugin ) {
   $field = bw_array_get( $plugin, "plugin", null );
@@ -192,6 +196,8 @@ function _oik_plugins_update_settings( $plugin ) {
 
 /**
  * Delete the settings for a plugin
+ *
+ * @param array $plugin
  */
 function _oik_plugins_delete_settings( $plugin ) {
   bw_delete_option( $plugin, "bw_plugins" );
@@ -199,6 +205,9 @@ function _oik_plugins_delete_settings( $plugin ) {
 
 /**
  * Validate the plugin name: plugin must not be blank
+ * 
+ * @param string $plugin - plugin name
+ * @return bool true if the plugin name is valid
  */
 function oik_plugins_validate_plugin( $plugin ) {
   $valid = isset( $plugin );
@@ -214,6 +223,7 @@ function oik_plugins_validate_plugin( $plugin ) {
     
 /**
  * Validate the plugin's settings and add/update if required
+ * 
  * @param bool $add_plugin 
  * @return bool - validation result
  */
@@ -238,6 +248,9 @@ function _oik_plugins_settings_validate( $add_plugin=true ) {
   return( $ok );
 }
 
+/**
+ * Display the plugin settings table form
+ */
 function oik_plugins_settings() {
   $default_plugin_server = oik_get_plugins_server();
   $link = retlink( null, $default_plugin_server, $default_plugin_server , "default oik plugins server" );
@@ -251,8 +264,11 @@ function oik_plugins_settings() {
   etag( "table" );
   p( isubmit( "_oik_plugins_add_plugin", "Add plugin", null, "button-primary" ) );
   etag( "form" );
-} 
+}
 
+/**
+ * Display the add settings form
+ */ 
 function oik_plugins_add_settings( ) {
   global $bw_plugin;
   bw_form();
@@ -265,6 +281,9 @@ function oik_plugins_add_settings( ) {
   etag( "form" );
 }
 
+/**
+ * Display the edit settings form
+ */
 function oik_plugins_edit_settings( ) {
   global $bw_plugin;
   bw_form();
@@ -278,7 +297,9 @@ function oik_plugins_edit_settings( ) {
 }
 
 /**
+ * Check a plugin for updates
  *
+ * The 
  (
     [slug] => oik
     [new_version] => 1.17.1030.1702
@@ -368,24 +389,26 @@ function oik_plugins_check() {
  
  */ 
 function oik_plugin_record_new_version( $plugin, $check_version, $response ) { 
-  bw_trace2( $response );
-  $option = get_site_option( "_site_transient_update_plugins" );
-  bw_trace2( $option, "option", false );
+	bw_trace2( $response );
+	$option = get_site_option( "_site_transient_update_plugins" );
+	bw_trace2( $option, "option", false );
   
-  $new_version = bw_array_get( $response, "new_version", null );
-  $plugin_name = bw_array_get( $response, "plugin", "$plugin/$plugin.php" );
-  //$option->checked[$plugin] = $check_version;
-  $option->response[$plugin_name] = $response;
-  $option->last_checked = time();
+	$new_version = bw_array_get( $response, "new_version", null );
+	$plugin_name = bw_array_get( $response, "plugin", "$plugin/$plugin.php" );
+	//$option->checked[$plugin] = $check_version;
+	$option->response[$plugin_name] = $response;
+	$option->last_checked = time();
   
-  bw_trace2( $option, "option", false );
-  update_site_option( "_site_transient_update_plugins", $option );
+	bw_trace2( $option, "option", false );
+	update_site_option( "_site_transient_update_plugins", $option );
 }  
 
 /** 
+ * Produce an Update plugin link
  *
- 
- (
+ * @param object $response
+ *
+ * `
     [slug] => oik
     [new_version] => 1.17.1030.1702
     [url] => http://oik-plugins.co.uk/oik_plugin/oik
@@ -393,7 +416,7 @@ function oik_plugin_record_new_version( $plugin, $check_version, $response ) {
     
   http://oik-plugins.co.uk/wp-admin/plugin-install.php?tab=plugin-information&plugin=oik&section=changelog&TB_iframe=true&width=640&height=662
   http://oik-plugins.co.uk/wp-admin/update.php?action=upgrade-plugin&plugin=oik%2Foik.php&_wpnonce=7efefad99d
-)
+ * `
  */
 function oik_plugin_new_version( $response ) {
   $slug = bw_array_get( $response, "slug", null );
@@ -449,6 +472,8 @@ function bw_delete_option( $field, $options="bw_options" ) {
 function bw_get_plugin_slugs() {
   $plugin_slugs = get_transient( 'plugin_slugs' );
   if ( false === $plugin_slugs ) {
+	
+		require_once( ABSPATH . "wp-admin/includes/plugin.php" );
     $plugins = get_plugins();
     bw_trace2( $plugins, "plugins", false, BW_TRACE_DEBUG );
     $plugin_slugs = array_keys( $plugins );
@@ -551,12 +576,6 @@ if ( !function_exists( "oik_get_plugins_server" ) ) {
 			$url = OIK_PLUGINS_COM;
 		}
 		return( $url );
-	}
-}
-
-if ( !function_exists( "oik_get_themes_server" ) ) {
-	function oik_get_themes_server() {
-		return( oik_get_plugins_server() );
 	}
 }
 

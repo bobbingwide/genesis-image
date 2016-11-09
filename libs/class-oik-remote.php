@@ -244,7 +244,7 @@ static function oik_check_checked_for_update( $checked ) {
 	$servers = array();
 	$apikeys = array();
 	foreach ( $checked as $plugin => $version ) {
-		$plugin_settings = oik_update::oik_query_plugins_server( bw_get_slug( $plugin ) );
+		$plugin_settings = oik_update::oik_query_plugins_server( oik_update::bw_get_slug( $plugin ) );
 		//bw_trace2( $plugin_settings, "plugin_settings", false );
 		if ( $plugin_settings ) {
 			$server = bw_array_get( $plugin_settings, "server", null ); 
@@ -446,7 +446,7 @@ static function oik_check_for_update( $plugin, $version ) {
 static function oik_check_for_theme_update( $theme, $version ) {
 	bw_trace2();
 	$response = null;
-	$theme_settings = oik__update::oik_query_themes_server( $theme );
+	$theme_settings = oik_update::oik_query_themes_server( $theme );
 	if ( $theme_settings ) {
 		$url = bw_array_get( $theme_settings, 'server', null );
 		$url .= '/themes/update-check/';

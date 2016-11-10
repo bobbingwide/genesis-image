@@ -53,6 +53,7 @@ function genesis_image_functions_loaded() {
 	// Implement update from oik servers
 	add_action( "admin_menu", "genesis_image_admin_menu", 13  );
 	add_action( "oik_register_theme_server", "genesis_image_register_theme_server" );
+	add_action( "oik_admin_menu", "genesis_image_oik_admin_menu" );
 }
 
 /**
@@ -81,11 +82,12 @@ function genesis_image_footer_creds_text( $text ) {
 }
  
 /** 
- * Implement after_setup_theme to see how the theme is defined
+ * Implement 'after_setup_theme' to see how the theme is defined
  */ 
 function genesis_image_after_setup_theme() {
+	genesis_image_trace_functions();
 	global $_wp_theme_features;
-	bw_trace2( $_wp_theme_features );
+	//bw_trace2( $_wp_theme_features );
 }
 
 /**
@@ -118,3 +120,25 @@ function genesis_image_register_theme_server() {
 }
 
 
+/**
+ * Implement "oik_admin_menu" 
+ * 
+ * We assume that oik_update::oik_register_theme_server() has been loaded, otherwise the action should not have been invoked.
+ *
+ */
+function genesis_image_oik_admin_menu() {
+	oik_register_theme_server( __FILE__ );
+}
+
+/**
+ * Register dummy trace functions if required
+ *
+ * These functions are expected to be defined by plugins.
+ * We defer registering the functions as long as we can.
+ */
+function genesis_image_trace_functions() {
+	if ( !function_exists( "bw_trace2" ) ) {
+		function bw_trace2( $p=null ) { return $p; }
+		function bw_backtrace() {}
+	}
+}

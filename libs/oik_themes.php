@@ -93,8 +93,15 @@ function oik_lazy_themes_server_settings() {
  *
  * Note: Delete may not appear to work as the entry is created automatically by the theme when it registers itself.
  * The Delete action will delete the theme's profile entry.
+ *
+ * @param string $theme - theme slug
+ * @param string $version - current theme version
+ * @param string $server - theme server
+ * @param string $apikey - API key for premium theme
+ * @param string $expiration - 
+ * @param bool $programmatically_registered - true if registered by the theme
  */
-function _oik_themes_settings_row( $theme, $version, $server, $apikey, $expiration ) {
+function _oik_themes_settings_row( $theme, $version, $server, $apikey, $expiration, $programmatically_registered ) {
   $row = array();
   $row[] = $theme;
   $row[] = $version . "&nbsp;"; 
@@ -103,7 +110,11 @@ function _oik_themes_settings_row( $theme, $version, $server, $apikey, $expirati
   $row[] = $expiration . "&nbsp;";
   // $row[] = itext( "expand[$theme]", $expand, true );
   $links = null;
-  $links .= retlink( null, admin_url("admin.php?page=oik_themes&amp;delete_theme=$theme"), "Delete", "Delete theme's profile entry" ); 
+	if ( $programmatically_registered ) {
+		$links .= retlink( null, admin_url("admin.php?page=oik_themes&amp;delete_theme=$theme"), "Reset", "Reset theme's profile entry" ); 
+	} else {
+		$links .= retlink( null, admin_url("admin.php?page=oik_themes&amp;delete_theme=$theme"), "Delete", "Delete theme's profile entry" ); 
+	}
   $links .= "&nbsp;";
   $links .= retlink( null, admin_url("admin.php?page=oik_themes&amp;edit_theme=$theme"), "Edit" ); 
   $links .= "&nbsp;"; 
@@ -118,6 +129,8 @@ function _oik_themes_settings_row( $theme, $version, $server, $apikey, $expirati
  * 
  * We don't override the values that the user has defined with the hardcoded values
  * Only apply the hardcoded values when the profile entry does not exist.
+ * 
+ * @return array of registered themes and their overrides
  */
 function _oik_themes_load_registered_themes() {
   $bw_themes = get_option( "bw_themes" );
@@ -128,7 +141,8 @@ function _oik_themes_load_registered_themes() {
       bw_trace2( $theme );
       if ( !isset( $bw_themes[$theme] ) ) {
         $bw_themes[$theme] = $theme_data;
-      }  
+      } 
+			$bw_themes[$theme]['programmatically_registered'] = true;
     }
   }
   return( $bw_themes );
@@ -146,7 +160,8 @@ function _oik_themes_settings_table() {
       $server = bw_get_theme_server( $theme, $theme_object, $theme_data );
       $apikey = bw_array_get( $theme_data, "apikey", null );
       $expiration = bw_array_get( $theme_data, "expiration", null );
-      _oik_themes_settings_row( $theme, $version, $server, $apikey, $expiration );
+			$programmatically_registered = bw_array_get( $theme_data, "programmatically_registered", false );
+      _oik_themes_settings_row( $theme, $version, $server, $apikey, $expiration, $programmatically_registered );
     }
   }  
 }

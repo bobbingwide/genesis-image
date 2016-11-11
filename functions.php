@@ -119,11 +119,10 @@ function genesis_image_register_theme_server() {
 	oik_update::oik_register_theme_server( __FILE__ );
 }
 
-
 /**
  * Implement "oik_admin_menu" 
  * 
- * We assume that oik_update::oik_register_theme_server() has been loaded, otherwise the action should not have been invoked.
+ * We assume that oik_register_theme_server() has been loaded, otherwise the action should not have been invoked.
  *
  */
 function genesis_image_oik_admin_menu() {

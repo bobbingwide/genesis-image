@@ -1,4 +1,4 @@
-<?php // (C) Copyright Bobbing Wide 2016
+<?php // (C) Copyright Bobbing Wide 2016,2017
 
 genesis_image_functions_loaded();
 
@@ -11,7 +11,7 @@ function genesis_image_functions_loaded() {
 
 	//* Child theme (do not remove) - is this really necessary? 
 	define( 'CHILD_THEME_NAME', 'Genesis image' );
-	define( 'CHILD_THEME_URL', 'http://www.bobbingwide.com/oik-themes/genesis-image' );
+	define( 'CHILD_THEME_URL', 'https://www.bobbingwide.com/blog/oik-themes/genesis-image' );
 	define( 'CHILD_THEME_VERSION', '1.1.0' );
 
 	// Start the engine	- this is necessary if we invoke any genesis_ functions before 'init'
@@ -66,17 +66,20 @@ function genesis_image_footer_creds_text( $text ) {
 	 * Cause shortcodes to be registered.
 	 */
 	do_action( "oik_add_shortcodes" );
-	if ( function_exists( "oik_add_shortcodes" ) ) {
+	if ( function_exists( "bw_oik_add_shortcodes" ) ) {
 		$text = "[bw_wpadmin]";
 		$text .= '<br />';
 		$text .= "[bw_copyright]"; 
 		$text .= '<hr />';
-		$text .= 'Website designed and developed by [bw_link text="Herb Miller" herbmiller.me] of';
+		
+		
+		$text .= 'Genesis-image theme designed and developed by [bw_link text="Herb Miller" herbmiller.me] of';
 		$text .= ' <a href="//www.bobbingwide.com" title="Bobbing Wide - web design, web development">[bw]</a>';
 		$text .= '<br />';
 		$text .= '[bw_power] and oik-plugins';
+		
 	} else {
-		$text = "(C) Copyright Bobbing Wide 2015,2016" ;
+		$text = "(C) Copyright Bobbing Wide 2015-2017";
 	}
 	return( $text );
 }
